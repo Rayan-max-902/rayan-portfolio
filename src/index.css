@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;700&display=swap');
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-space: "Space Grotesk", sans-serif;
+}
+
+@layer components {
+  .reveal-section {
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", sans-serif;
+  }
+
+  .reveal-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0 10%;
+    height: 200vh;
+    background-color: #0d0d0d;
+  }
+
+  .reveal-text {
+    font-size: 10vw;
+    letter-spacing: -0.01em;
+    line-height: 100%;
+    margin: 0;
+    width: 100%;
+    color: rgba(182, 182, 182, 0.2);
+    background: linear-gradient(to right, #b6b6b6, #b6b6b6) no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-size: 0%;
+    transition: background-size cubic-bezier(0.1, 0.5, 0.5, 1) 0.5s;
+    border-bottom: 1px solid #2f2b28;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    position: relative;
+    animation-name: reveal;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    animation-timeline: view();
+    animation-range: entry 100% cover 50%;
+  }
+
+  @keyframes reveal {
+    to {
+      background-size: 100%;
+    }
+  }
+
+  .reveal-span {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    background-color: #4246ce;
+    color: #0d0d0d;
+    clip-path: polygon(0 50%, 100% 50%, 100% 50%, 0 50%);
+    transform-origin: center;
+    transition: all cubic-bezier(0.1, 0.5, 0.5, 1) 0.4s;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .reveal-text:hover > .reveal-span {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+  }
+
+  /* Stacking Cards */
+  :root {
+    --card-height: 40vw;
+    --card-margin: 4vw;
+    --card-top-offset: 1em;
+  }
+
+  .card {
+    padding-top: calc(var(--index) * var(--card-top-offset));
+  }
+
+  .card__content {
+    transform-origin: 50% 0%;
+    animation: scale-card linear forwards;
+    animation-timeline: view();
+    animation-range: exit-crossing 0% exit-crossing 100%;
+  }
+
+  @keyframes scale-card {
+    to {
+      transform: scale(0.8) translateY(-10vh) rotateX(-20deg);
+      filter: brightness(0.6);
+      border-radius: 20px;
+    }
+  }
+
+  /* Card variants with different colors */
+  .card:nth-child(4n+1) .card__content { background: #ff2a6d; }
+  .card:nth-child(4n+2) .card__content { background: #05d9e8; color: #000; }
+  .card:nth-child(4n+3) .card__content { background: #ffe600; color: #000; }
+  .card:nth-child(4n+4) .card__content { background: #fafac6; color: #000; }
+
+  @keyframes progress-spin {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+}
