@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send } from 'lucide-react';
 import { Comment } from '../types';
@@ -19,18 +19,51 @@ export default function Comments({ title, namePlaceholder, commentPlaceholder, p
   const [comments, setComments] = useState<Comment[]>([]);
   const [newName, setNewName] = useState('');
   const [newComment, setNewComment] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAddComment = () => {
-    if (!newName.trim() || !newComment.trim()) return;
-    const comment: Comment = {
-      id: Date.now(),
-      name: newName,
-      text: newComment,
-      date: new Date().toLocaleDateString()
-    };
-    setComments([comment, ...comments]);
-    setNewName('');
-    setNewComment('');
+  useEffect(() => {
+    fetchComments();
+  }, []);
+
+  const fetchComments = async () => {
+    try {
+      const response = await fetch('/api/comments');
+      if (response.ok) {
+        const data = await response.json();
+        setComments(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch comments:', error);
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (!newName.trim() || !newComment.trim() || isLoading) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/comments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: newName,
+          text: newComment,
+        }),
+      });
+
+      if (response.ok) {
+        const comment = await response.json();
+        setComments([comment, ...comments]);
+        setNewName('');
+        setNewComment('');
+      }
+    } catch (error) {
+      console.error('Failed to add comment:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -52,10 +85,11 @@ export default function Comments({ title, namePlaceholder, commentPlaceholder, p
         />
         <button 
           onClick={handleAddComment}
-          className="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/20 active:scale-95"
+          disabled={isLoading}
+          className={`w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/20 active:scale-95 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           <Send className="w-4 h-4" />
-          {publishButton}
+          {isLoading ? '...' : publishButton}
         </button>
       </div>
 
