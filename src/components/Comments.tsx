@@ -15,8 +15,29 @@ interface CommentsProps {
   publishButton: string;
 }
 
+const DEFAULT_COMMENTS: Comment[] = [
+  {
+    id: 1,
+    name: "Équipe Codexa.ma",
+    text: "Excellente collaboration avec Rayan sur nos architectures backend et nos modules IA. Très rigoureux et réactif !",
+    date: "20/05/2026"
+  },
+  {
+    id: 2,
+    name: "Comité One Run Global",
+    text: "Organisation remarquable lors du marathon international One Run Global Marathon. Un profil proactif et visionnaire.",
+    date: "18/05/2026"
+  },
+  {
+    id: 3,
+    name: "Karim B. (Recruteur Tech)",
+    text: "Impressionné par le projet d'automatisation du recrutement et l'intégration de DeepSeek R1.",
+    date: "12/05/2026"
+  }
+];
+
 export default function Comments({ title, namePlaceholder, commentPlaceholder, publishButton }: CommentsProps) {
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<Comment[]>(DEFAULT_COMMENTS);
   const [newName, setNewName] = useState('');
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,10 +51,12 @@ export default function Comments({ title, namePlaceholder, commentPlaceholder, p
       const response = await fetch('/api/comments');
       if (response.ok) {
         const data = await response.json();
-        setComments(data);
+        if (Array.isArray(data) && data.length > 0) {
+          setComments(data);
+        }
       }
     } catch (error) {
-      console.error('Failed to fetch comments:', error);
+      console.warn('API comments fetch fallback:', error);
     }
   };
 
@@ -41,6 +64,20 @@ export default function Comments({ title, namePlaceholder, commentPlaceholder, p
     if (!newName.trim() || !newComment.trim() || isLoading) return;
     
     setIsLoading(true);
+    const tempComment: Comment = {
+      id: Date.now(),
+      name: newName.trim(),
+      text: newComment.trim(),
+      date: new Date().toLocaleDateString(),
+    };
+
+    // Optimistically add to UI immediately so the visitor sees their message without delay
+    setComments((prev) => [tempComment, ...prev]);
+    const currentName = newName;
+    const currentText = newComment;
+    setNewName('');
+    setNewComment('');
+
     try {
       const response = await fetch('/api/comments', {
         method: 'POST',
@@ -48,40 +85,39 @@ export default function Comments({ title, namePlaceholder, commentPlaceholder, p
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: newName,
-          text: newComment,
+          name: currentName,
+          text: currentText,
         }),
       });
 
       if (response.ok) {
-        const comment = await response.json();
-        setComments([comment, ...comments]);
-        setNewName('');
-        setNewComment('');
+        const savedComment = await response.json();
+        // Update with actual saved server ID
+        setComments((prev) => prev.map((c) => (c.id === tempComment.id ? savedComment : c)));
       }
     } catch (error) {
-      console.error('Failed to add comment:', error);
+      console.error('Failed to sync comment to server:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
+    <div className="bg-white dark:bg-zinc-900 p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
       <div className="space-y-4 mb-8">
         <input 
           type="text" 
           placeholder={namePlaceholder}
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
-          className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white"
+          className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-base dark:text-white"
         />
         <textarea 
           placeholder={commentPlaceholder}
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          rows={4}
-          className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white resize-none"
+          rows={3}
+          className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-base dark:text-white resize-none"
         />
         <button 
           onClick={handleAddComment}

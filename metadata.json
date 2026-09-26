@@ -1,5 +1,6 @@
 {
   "name": "Rayan El Moatadide | Portfolio",
   "description": "Portfolio professionnel de Rayan El Moatadide, Ingénieur en Intelligence Artificielle et Fondateur de startup.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

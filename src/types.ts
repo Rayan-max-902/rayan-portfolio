@@ -34,6 +34,10 @@ export interface Translation {
   exp5Text: string;
   exp6Title: string;
   exp6Text: string;
+  exp7Title: string;
+  exp7Text: string;
+  exp8Title: string;
+  exp8Text: string;
   skillsTitle: string;
   skillsList: string[];
   languagesTitle: string;

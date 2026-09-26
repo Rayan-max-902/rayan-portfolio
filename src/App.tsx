@@ -22,59 +22,79 @@ import {
 import { Language } from './types';
 import { translations } from './constants';
 import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import RevealSection from './components/RevealSection';
+import HeroShowcase from './components/HeroShowcase';
+import AboutShowcaseSection from './components/AboutShowcaseSection';
+import ServicesSection from './components/ServicesSection';
+import FloatingActions from './components/FloatingActions';
 import RayanAI from './components/RayanAI';
 import SectionTitle from './components/SectionTitle';
-import Card from './components/Card';
 import StackingCards from './components/StackingCards';
 import Comments from './components/Comments';
+import CustomCursor from './components/CustomCursor';
 
 export default function App() {
   const [lang, setLang] = useState<Language>('fr');
-  const [isDark, setIsDark] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
 
-  const t = translations[lang];
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      document.documentElement.style.colorScheme = 'dark';
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.style.colorScheme = 'light';
-    }
-  }, [isDark]);
+  const t = translations[lang] || translations.fr;
 
   useEffect(() => {
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.classList.add('dark');
   }, [lang]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black transition-colors duration-300 font-sans">
-      <Navbar lang={lang} setLang={setLang} isDark={isDark} setIsDark={setIsDark} />
+    <div className="min-h-screen bg-[#1b1f2c] text-zinc-100 transition-colors duration-300 font-sans selection:bg-[#7c62e3] selection:text-white">
+      {/* Custom follower cursor matching image.png */}
+      <CustomCursor />
 
-      <RevealSection />
+      {/* Navbar with Monogram RM, Floating Dark Glass Pill, Menu Button */}
+      <Navbar 
+        lang={lang} 
+        setLang={setLang} 
+        activeSection={activeSection} 
+        setActiveSection={setActiveSection} 
+      />
 
-      <Hero name={t.mainName} title={t.title} />
+      {/* Main Hero & Curved 3D Showcase (Images 1 & 2) */}
+      <HeroShowcase />
 
-      <main className="max-w-4xl mx-auto px-4 py-12 space-y-24">
-        {/* Profile */}
-        <section id="profile">
+      {/* About Me Showcase Section matching mohamed-hosni.com directly below gallery */}
+      <AboutShowcaseSection />
+
+      {/* Services Section */}
+      <ServicesSection />
+
+      {/* Content Container */}
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24 space-y-20 sm:space-y-28">
+        {/* About Me / Profile */}
+        <section id="profile" className="scroll-mt-24">
           <SectionTitle icon={User}>{t.profileTitle}</SectionTitle>
           <motion.div 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            className="p-8 bg-blue-600 rounded-3xl text-white shadow-xl shadow-blue-500/20"
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="p-6 sm:p-10 bg-[#121624] border border-white/10 rounded-3xl text-white shadow-2xl relative overflow-hidden group"
           >
-            <p className="text-lg leading-relaxed font-medium opacity-95">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#5c60e6]/10 rounded-full blur-3xl pointer-events-none" />
+            <p className="text-base sm:text-lg md:text-xl leading-relaxed font-normal text-zinc-200">
               {t.profileText}
             </p>
+
+            <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap gap-4 items-center justify-between text-xs sm:text-sm text-zinc-400">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span>Spécialisation DeepSeek R1 &amp; Backend Codexa.ma</span>
+              </div>
+              <div className="font-mono text-zinc-500">
+                AI &amp; DATA ENGINE 2026
+              </div>
+            </div>
           </motion.div>
         </section>
 
         {/* Education */}
-        <section id="education">
+        <section id="education" className="scroll-mt-24">
           <SectionTitle icon={GraduationCap}>{t.educationTitle}</SectionTitle>
           <StackingCards 
             items={[
@@ -88,7 +108,7 @@ export default function App() {
         </section>
 
         {/* Experience */}
-        <section id="experience">
+        <section id="experience" className="scroll-mt-24">
           <SectionTitle icon={Briefcase}>{t.experienceTitle}</SectionTitle>
           <StackingCards 
             items={[
@@ -98,25 +118,28 @@ export default function App() {
               { title: t.exp4Title, text: t.exp4Text, number: "04" },
               { title: t.exp5Title, text: t.exp5Text, number: "05" },
               { title: t.exp6Title, text: t.exp6Text, number: "06" },
+              { title: t.exp7Title, text: t.exp7Text, number: "07" },
+              { title: t.exp8Title, text: t.exp8Text, number: "08" },
             ]}
           />
         </section>
 
         {/* Skills & Languages */}
-        <div className="grid md:grid-cols-2 gap-8">
-          <section id="skills">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <section id="skills" className="scroll-mt-24">
             <SectionTitle icon={Code}>{t.skillsTitle}</SectionTitle>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {t.skillsList.map((skill, i) => (
                 <motion.div 
                   key={i}
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex items-center gap-3 group hover:border-blue-500/50 transition-colors"
+                  transition={{ delay: i * 0.04 }}
+                  viewport={{ once: true }}
+                  className="p-4 bg-[#121624] rounded-2xl border border-white/10 flex items-center gap-3 group hover:border-[#5c60e6]/60 transition-colors shadow-lg"
                 >
-                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full group-hover:scale-150 transition-transform" />
-                  <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">
+                  <div className="w-2 h-2 bg-[#5c60e6] rounded-full group-hover:scale-150 transition-transform shrink-0" />
+                  <span className="text-xs sm:text-sm font-semibold text-zinc-200 uppercase tracking-wider truncate">
                     {skill}
                   </span>
                 </motion.div>
@@ -124,23 +147,26 @@ export default function App() {
             </div>
           </section>
 
-          <section id="languages">
+          <section id="languages" className="scroll-mt-24">
             <SectionTitle icon={LangIcon}>{t.languagesTitle}</SectionTitle>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {t.languagesList.map((langItem, i) => (
                 <motion.div 
                   key={i}
                   initial={{ opacity: 0, x: -10 }}
                   whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex justify-between items-center group hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                  transition={{ delay: i * 0.08 }}
+                  viewport={{ once: true }}
+                  className="p-4 sm:p-5 bg-[#121624] rounded-2xl border border-white/10 flex justify-between items-center group hover:border-[#5c60e6]/40 transition-colors shadow-lg"
                 >
-                  <span className="font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">{langItem}</span>
-                  <div className="flex gap-1">
+                  <span className="font-semibold text-xs sm:text-sm text-zinc-200 uppercase tracking-wider">
+                    {langItem}
+                  </span>
+                  <div className="flex gap-1.5">
                     {[1, 2, 3, 4, 5].map((dot) => (
                       <div 
                         key={dot} 
-                        className={`w-2 h-2 rounded-full ${dot <= (i === 0 ? 5 : i === 1 ? 4 : 3) ? 'bg-blue-600' : 'bg-zinc-200 dark:bg-zinc-700'}`} 
+                        className={`w-2 h-2 rounded-full ${dot <= (i === 0 ? 5 : i === 1 ? 4 : 3) ? 'bg-[#5c60e6]' : 'bg-zinc-800'}`} 
                       />
                     ))}
                   </div>
@@ -150,75 +176,114 @@ export default function App() {
           </section>
         </div>
 
-        {/* Contact */}
-        <section id="contact">
+        {/* Contact Me */}
+        <section id="contact" className="scroll-mt-24">
           <SectionTitle icon={Phone}>{t.contactTitle}</SectionTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex flex-col items-center text-center">
-              <Phone className="w-8 h-8 text-blue-600 mb-4" />
-              <p className="text-zinc-900 dark:text-zinc-100 font-bold">{t.contactPhone}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <a 
+              href={`tel:${t.contactPhone.replace(/\s+/g, '')}`}
+              className="p-6 bg-[#121624] rounded-3xl border border-white/10 flex flex-col items-center text-center hover:border-[#5c60e6]/60 active:scale-98 transition-all group shadow-xl"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-[#5c60e6]/15 flex items-center justify-center text-[#818cf8] mb-3 group-hover:scale-110 transition-transform">
+                <Phone className="w-6 h-6" />
+              </div>
+              <p className="text-xs text-zinc-400 mb-1">Téléphone</p>
+              <p className="text-white font-bold text-sm sm:text-base">{t.contactPhone}</p>
+            </a>
+
+            <a 
+              href={`mailto:${t.contactEmail}`}
+              className="p-6 bg-[#121624] rounded-3xl border border-white/10 flex flex-col items-center text-center hover:border-[#5c60e6]/60 active:scale-98 transition-all group shadow-xl"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-[#5c60e6]/15 flex items-center justify-center text-[#818cf8] mb-3 group-hover:scale-110 transition-transform">
+                <Mail className="w-6 h-6" />
+              </div>
+              <p className="text-xs text-zinc-400 mb-1">Email</p>
+              <p className="text-white font-bold truncate w-full text-sm sm:text-base">{t.contactEmail}</p>
+            </a>
+
+            <div className="p-6 bg-[#121624] rounded-3xl border border-white/10 flex flex-col items-center text-center shadow-xl">
+              <div className="w-12 h-12 rounded-2xl bg-[#5c60e6]/15 flex items-center justify-center text-[#818cf8] mb-3">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <p className="text-xs text-zinc-400 mb-1">Localisation</p>
+              <p className="text-white font-bold text-sm sm:text-base">{t.contactLocation}</p>
             </div>
-            <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex flex-col items-center text-center">
-              <Mail className="w-8 h-8 text-blue-600 mb-4" />
-              <p className="text-zinc-900 dark:text-zinc-100 font-bold truncate w-full">{t.contactEmail}</p>
-            </div>
-            <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex flex-col items-center text-center">
-              <MapPin className="w-8 h-8 text-blue-600 mb-4" />
-              <p className="text-zinc-900 dark:text-zinc-100 font-bold">{t.contactLocation}</p>
-            </div>
+
             <a 
               href="https://www.instagram.com/rayan_moatadide?igsh=MW1rc2Jkd3czMTRjdQ==" 
               target="_blank" 
               rel="noreferrer"
-              className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex flex-col items-center text-center hover:border-pink-500/50 transition-colors group"
+              className="p-6 bg-[#121624] rounded-3xl border border-white/10 flex flex-col items-center text-center hover:border-pink-500/50 active:scale-98 transition-all group shadow-xl"
             >
-              <Instagram className="w-8 h-8 text-pink-600 mb-4 group-hover:scale-110 transition-transform" />
-              <p className="text-zinc-900 dark:text-zinc-100 font-bold">{t.instagramLabel}</p>
+              <div className="w-12 h-12 rounded-2xl bg-pink-500/15 flex items-center justify-center text-pink-500 mb-3 group-hover:scale-110 transition-transform">
+                <Instagram className="w-6 h-6" />
+              </div>
+              <p className="text-xs text-zinc-400 mb-1">Instagram</p>
+              <p className="text-white font-bold text-sm sm:text-base">{t.instagramLabel}</p>
             </a>
+
             <a 
               href="https://www.linkedin.com/in/moatadid-rayan-763b7238b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" 
               target="_blank" 
               rel="noreferrer"
-              className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex flex-col items-center text-center hover:border-blue-500/50 transition-colors group"
+              className="p-6 bg-[#121624] rounded-3xl border border-white/10 flex flex-col items-center text-center hover:border-blue-500/50 active:scale-98 transition-all group shadow-xl"
             >
-              <Linkedin className="w-8 h-8 text-blue-600 mb-4 group-hover:scale-110 transition-transform" />
-              <p className="text-zinc-900 dark:text-zinc-100 font-bold">{t.linkedinLabel}</p>
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/15 flex items-center justify-center text-blue-400 mb-3 group-hover:scale-110 transition-transform">
+                <Linkedin className="w-6 h-6" />
+              </div>
+              <p className="text-xs text-zinc-400 mb-1">LinkedIn</p>
+              <p className="text-white font-bold text-sm sm:text-base">{t.linkedinLabel}</p>
+            </a>
+
+            <a 
+              href="https://wa.me/212717568270?text=Bonjour%20Rayan,%20je%20vous%20contacte%20depuis%20votre%20portfolio" 
+              target="_blank" 
+              rel="noreferrer"
+              className="p-6 bg-[#121624] rounded-3xl border border-white/10 flex flex-col items-center text-center hover:border-emerald-500/50 active:scale-98 transition-all group shadow-xl"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 flex items-center justify-center text-emerald-400 mb-3 group-hover:scale-110 transition-transform">
+                <MessageSquare className="w-6 h-6" />
+              </div>
+              <p className="text-xs text-zinc-400 mb-1">WhatsApp Direct</p>
+              <p className="text-emerald-400 font-bold text-sm sm:text-base">Démarrer un chat</p>
             </a>
           </div>
         </section>
 
-        {/* Comments */}
-        <section id="comments">
+        {/* Comments / Guestbook */}
+        <section id="comments" className="scroll-mt-24">
           <SectionTitle icon={MessageSquare}>{t.commentsTitle}</SectionTitle>
-          <Comments 
-            title={t.commentsTitle}
-            namePlaceholder={t.namePlaceholder}
-            commentPlaceholder={t.commentPlaceholder}
-            publishButton={t.publishButton}
-          />
+          <div className="p-6 sm:p-8 bg-[#121624] rounded-3xl border border-white/10 shadow-2xl">
+            <Comments 
+              title={t.commentsTitle}
+              namePlaceholder={t.namePlaceholder}
+              commentPlaceholder={t.commentPlaceholder}
+              publishButton={t.publishButton}
+            />
+          </div>
         </section>
       </main>
 
+      {/* Floating Action Buttons: Phone & WhatsApp on Bottom Left, Scroll Top on Bottom Right */}
+      <FloatingActions />
+
+      {/* Rayan AI Assistant Modal */}
       <RayanAI />
 
-      {/* Circular Progress Indicator */}
-      <svg className="progress-circle fixed bottom-[30px] right-[30px] w-20 h-20 z-[100] pointer-events-none" viewBox="0 0 100 100">
-        <circle 
-          cx="50" cy="50" r="40" 
-          className="fill-none stroke-blue-600 dark:stroke-blue-400 stroke-[6] origin-center -rotate-90"
-          style={{
-            strokeDasharray: 251,
-            strokeDashoffset: 251,
-            animation: 'progress-spin linear',
-            animationTimeline: 'scroll()'
-          }}
-        />
-      </svg>
-
-      <footer className="py-12 border-t border-zinc-200 dark:border-zinc-800 text-center">
-        <p className="text-zinc-500 dark:text-zinc-500 text-sm font-medium">
-          {t.footer}
-        </p>
+      {/* Footer */}
+      <footer className="py-12 border-t border-white/10 text-center bg-[#0a0d14]">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <span className="font-bebas text-2xl font-bold tracking-wider text-white">
+            RAYAN EL MOATADIDE
+          </span>
+          <p className="text-zinc-500 text-xs sm:text-sm font-medium">
+            {t.footer}
+          </p>
+          <span className="text-xs text-zinc-600 font-mono">
+            AI ENGINEER • CASABLANCA / MOHAMMEDIA
+          </span>
+        </div>
       </footer>
     </div>
   );
